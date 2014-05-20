@@ -1,0 +1,10 @@
+<!-- Copyright (C) 2014 Fonpit AG
+
+     Creative Commons Attribution 2.5 License:
+     http://creativecommons.org/licenses/by/2.5/
+ -->
+<resources>
+    <string name="app_name">Android Color Thief</string>
+    <string name="dominant_color">Dominant Color</string>
+    <string name="palette">Palette</string>
+</resources>

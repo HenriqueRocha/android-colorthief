@@ -1,0 +1,13 @@
+<!-- Copyright (C) 2014 Fonpit AG
+
+     Creative Commons Attribution 2.5 License:
+     http://creativecommons.org/licenses/by/2.5/
+ -->
+<resources>
+
+    <!-- Base application theme. -->
+    <style name="AppTheme" parent="android:Theme.Holo.Light">
+        <!-- Customize your theme here. -->
+    </style>
+
+</resources>

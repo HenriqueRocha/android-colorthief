@@ -1,0 +1,74 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- Copyright (C) 2014 Fonpit AG
+
+     Creative Commons Attribution 2.5 License:
+     http://creativecommons.org/licenses/by/2.5/
+ -->
+
+<LinearLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:orientation="horizontal"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:padding="@dimen/default_activity_padding">
+
+    <ImageView
+        android:layout_width="0dp"
+        android:layout_height="match_parent"
+        android:layout_weight="1"
+        android:layout_marginBottom="@dimen/default_activity_padding"
+        android:layout_gravity="center_horizontal"
+        android:src="@drawable/photo1"/>
+
+    <LinearLayout
+        android:layout_width="0dp"
+        android:layout_height="match_parent"
+        android:layout_weight="1"
+        android:gravity="center"
+        android:orientation="vertical">
+
+        <TextView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginBottom="@dimen/default_padding"
+            android:gravity="center"
+            android:textAppearance="?android:attr/textAppearanceMedium"
+            android:text="@string/dominant_color"
+            android:textAllCaps="true"
+            android:textStyle="bold"
+            android:fontFamily="sans-serif-condensed"/>
+
+        <LinearLayout
+            android:id="@+id/dominant_color"
+            android:layout_width="96dp"
+            android:layout_height="48dp"
+            android:layout_gravity="center"
+            android:orientation="horizontal"
+            tools:background="@android:color/darker_gray"/>
+
+        <TextView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginBottom="@dimen/default_padding"
+            android:gravity="center"
+            android:layout_marginTop="@dimen/default_activity_padding"
+            android:textAppearance="?android:attr/textAppearanceMedium"
+            android:text="@string/palette"
+            android:textAllCaps="true"
+            android:textStyle="bold"
+            android:fontFamily="sans-serif-condensed"/>
+
+        <LinearLayout
+            android:id="@+id/palette"
+            android:layout_gravity="center"
+            android:gravity="center"
+            android:orientation="horizontal"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content">
+
+            <!-- Will be filled dinamically with swatches -->
+
+        </LinearLayout>
+    </LinearLayout>
+</LinearLayout>
