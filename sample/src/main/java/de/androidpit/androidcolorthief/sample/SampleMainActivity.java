@@ -45,7 +45,7 @@ public class SampleMainActivity extends Activity {
         setContentView(R.layout.activity_main);
 
         Bitmap icon = BitmapFactory.decodeResource(getResources(), R.drawable.photo1);
-        List<int[]> result = new ArrayList<>();
+        List<int[]> result = new ArrayList<int[]>();
         try {
             result = MMCQ.compute(icon, 5);
         } catch (IOException e) {
