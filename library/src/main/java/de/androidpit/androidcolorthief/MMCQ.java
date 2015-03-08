@@ -101,6 +101,11 @@ public class MMCQ {
 		private Integer _count;
 		private List<Integer> histo = new ArrayList<Integer>();
 
+
+        public boolean canSplit () {
+            return  !(r1 == r2 && b1 == b2 && g1 == g2);
+        }
+
 		public int getVolume(boolean recompute) {
 			if (_volume == null || recompute) {
 				_volume = ((r2 - r1 + 1) * (g2 - g1 + 1) * (b2 - b1 + 1));
@@ -501,7 +506,7 @@ public class MMCQ {
 		while (niters < MAX_ITERATIONS) {
 			vbox = lh.get(lh.size() - 1);
 			lh.remove(lh.size() - 1);
-			if (vbox.count(false) == 0) {
+			if (vbox.count(false) == 0 || !vbox.canSplit()) {
 				lh.add(vbox);
 				niters++;
 				continue;
