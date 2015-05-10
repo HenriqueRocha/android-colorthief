@@ -185,7 +185,7 @@ public class MMCQ {
         Iterator<Integer> it = partialsum.iterator();
         i = 0;
         while (it.hasNext()) {
-            Integer integer = (Integer) it.next();
+            Integer integer = it.next();
             lookaheadsum.add(i, total - integer);
             i++;
         }
@@ -204,7 +204,7 @@ public class MMCQ {
             dim1 = vbox.getB1();
             dim2 = vbox.getB2();
         }
-        VBox vbox1 = null, vbox2 = null;
+        VBox vbox1, vbox2;
         int left, right, d2;
         Integer count2;
         for (int i = dim1; i < dim2; i++) {
@@ -262,11 +262,8 @@ public class MMCQ {
         });
         r = iter(pq, maxcolors - pq.size(), histo, nColors, niters);
         pq = (List<VBox>) r[0];
-        nColors = (Integer) r[1];
-        niters = (Integer) r[2];
         CMap cmap = new CMap();
-        for (Iterator<VBox> iterator = pq.iterator(); iterator.hasNext(); ) {
-            VBox vBox2 = iterator.next();
+        for (VBox vBox2 : pq) {
             cmap.push(vBox2);
         }
         return cmap;
@@ -375,11 +372,6 @@ public class MMCQ {
             return avg;
         }
 
-        public boolean contains(int[] pixel) {
-            int rval = pixel[0] >> RSHIFT, gval = pixel[1] >> RSHIFT, bval = pixel[2] >> RSHIFT;
-            return (rval >= r1 && rval <= r2 && gval >= g1 && gval <= g2 && bval >= b1 && bval <= b2);
-        }
-
         public int count(boolean recompute) {
             if (count == null || recompute) {
                 int npix = 0, i, j, k, index;
@@ -429,14 +421,6 @@ public class MMCQ {
             this.g2 = g2;
         }
 
-        public List<Integer> getHisto() {
-            return histo;
-        }
-
-        public void setHisto(List<Integer> histo) {
-            this.histo = histo;
-        }
-
         public int getB1() {
             return b1;
         }
@@ -455,29 +439,16 @@ public class MMCQ {
     }
 
     static class DenormalizedVBox {
-        private VBox vbox;
         private int[] color;
 
         public DenormalizedVBox(VBox vbox, int[] color) {
-            this.vbox = vbox;
             this.color = color;
-        }
-
-        public VBox getVbox() {
-            return vbox;
-        }
-
-        public void setVbox(VBox vbox) {
-            this.vbox = vbox;
         }
 
         public int[] getColor() {
             return color;
         }
 
-        public void setColor(int[] color) {
-            this.color = color;
-        }
     }
 
     static class CMap {
@@ -496,30 +467,6 @@ public class MMCQ {
             return r;
         }
 
-        public int size() {
-            return vboxes.size();
-        }
-
-        public int[] map(int[] color) {
-            for (DenormalizedVBox vb : vboxes) {
-                if (vb.vbox.contains(color))
-                    return vb.color;
-            }
-            return nearest(color);
-        }
-
-        public int[] nearest(int[] color) {
-            Double d1 = null, d2 = null;
-            int[] pColor = null;
-            for (DenormalizedVBox vb : vboxes) {
-                d2 = Math.sqrt(Math.pow(color[0] - vb.getColor()[0], 2) + Math.pow(color[1] - vb.getColor()[1], 2) + Math.pow(color[2] - vb.getColor()[2], 2));
-                if (d2 < d1 || d1 == null) {
-                    d1 = d2;
-                    pColor = vb.getColor();
-                }
-            }
-            return pColor;
-        }
     }
 
 }
