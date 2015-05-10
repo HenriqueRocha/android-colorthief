@@ -113,7 +113,7 @@ public class MMCQ {
         if (vbox.count(false) == 0)
             return null;
         if (vbox.count(false) == 1) {
-            return new VBox[]{vbox.clone()};
+            return new VBox[]{vbox.copy()};
         }
         int rw = vbox.r2 - vbox.r1 + 1, gw = vbox.g2 - vbox.g1 + 1, bw = vbox.b2 - vbox.b1 + 1, maxw = Math.max(Math.max(rw, gw), bw);
 
@@ -202,8 +202,8 @@ public class MMCQ {
         Integer count2;
         for (int i = dim1; i < dim2; i++) {
             if (partialsum.get(i) > total / 2) {
-                vbox1 = vbox.clone();
-                vbox2 = vbox.clone();
+                vbox1 = vbox.copy();
+                vbox2 = vbox.copy();
                 left = i - dim1;
                 right = dim2 - i;
                 if (left <= right) {
@@ -325,7 +325,7 @@ public class MMCQ {
             return volume;
         }
 
-        public VBox clone() {
+        public VBox copy() {
             return new VBox(r1, r2, g1, g2, b1, b2, histo);
         }
 
