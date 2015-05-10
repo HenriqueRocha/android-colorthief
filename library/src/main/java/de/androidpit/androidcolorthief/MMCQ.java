@@ -1,4 +1,5 @@
 /*
+ * Copyright (C) 2015 Henrique Rocha
  * Copyright (C) 2014 Fonpit AG
  *
  * License
