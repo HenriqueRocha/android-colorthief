@@ -305,6 +305,7 @@ public class MMCQ {
         private Integer volume;
         private Integer count;
         private List<Integer> histo = new ArrayList<>();
+
         // r1: 0 / r2: 18 / g1: 0 / g2: 31 / b1: 0 / b2: 31
         public VBox(int r1, int r2, int g1, int g2, int b1, int b2, List<Integer> histo) {
             super();
@@ -334,45 +335,52 @@ public class MMCQ {
         }
 
         public int[] avg(boolean recompute) {
-            if (avg == null || recompute) {
-                int ntot = 0, mult = 1 << (8 - SIGBITS), rsum = 0, gsum = 0, bsum = 0, hval, i, j, k, histoindex;
-                for (i = r1; i <= r2; i++) {
-                    for (j = g1; j <= g2; j++) {
-                        for (k = b1; k <= b2; k++) {
-                            histoindex = getColorIndex(i, j, k);
-                            Integer g = histo.get(histoindex);
-                            hval = (g != null ? g : 0);
-                            ntot += hval;
-                            rsum += (hval * (i + 0.5) * mult);
-                            gsum += (hval * (j + 0.5) * mult);
-                            bsum += (hval * (k + 0.5) * mult);
-                        }
+            if (avg != null && !recompute) return avg;
+
+            int ntot = 0;
+            int mult = 1 << (8 - SIGBITS);
+            int redSum = 0, greenSum = 0, blueSum = 0;
+            int hval;
+            int histoindex;
+
+            for (int i = r1; i <= r2; i++) {
+                for (int j = g1; j <= g2; j++) {
+                    for (int k = b1; k <= b2; k++) {
+                        histoindex = getColorIndex(i, j, k);
+                        Integer g = histo.get(histoindex);
+                        hval = (g != null ? g : 0);
+                        ntot += hval;
+                        redSum += (hval * (i + 0.5) * mult);
+                        greenSum += (hval * (j + 0.5) * mult);
+                        blueSum += (hval * (k + 0.5) * mult);
                     }
                 }
-                if (ntot > 0) {
-                    avg = new int[]{~~(rsum / ntot), ~~(gsum / ntot), ~~(bsum / ntot)};
-                } else {
-                    avg = new int[]{~~(mult * (r1 + r2 + 1) / 2), ~~(mult * (g1 + g2 + 1) / 2), ~~(mult * (b1 + b2 + 1) / 2)};
-                }
-
             }
+
+            if (ntot > 0) {
+                avg = new int[]{~~(redSum / ntot), ~~(greenSum / ntot), ~~(blueSum / ntot)};
+            } else {
+                avg = new int[]{~~(mult * (r1 + r2 + 1) / 2), ~~(mult * (g1 + g2 + 1) / 2), ~~(mult * (b1 + b2 + 1) / 2)};
+            }
+
             return avg;
         }
 
         public int count(boolean recompute) {
-            if (count == null || recompute) {
-                int npix = 0, i, j, k, index;
-                for (i = r1; i <= r2; i++) {
-                    for (j = g1; j <= g2; j++) {
-                        for (k = b1; k <= b2; k++) {
-                            index = getColorIndex(i, j, k);
-                            Integer g = histo.get(index);
-                            npix += (g != null ? g : 0);
-                        }
+            if (count != null && !recompute) return count;
+
+            int npix = 0;
+            for (int i = r1; i <= r2; i++) {
+                for (int j = g1; j <= g2; j++) {
+                    for (int k = b1; k <= b2; k++) {
+                        int index = getColorIndex(i, j, k);
+                        Integer g = histo.get(index);
+                        npix += (g != null ? g : 0);
                     }
                 }
-                count = npix;
             }
+            count = npix;
+
             return count;
         }
 
