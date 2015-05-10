@@ -431,30 +431,17 @@ public class MMCQ {
         }
     }
 
-    static class DenormalizedVBox {
-        private int[] color;
-
-        public DenormalizedVBox(VBox vbox, int[] color) {
-            this.color = color;
-        }
-
-        public int[] getColor() {
-            return color;
-        }
-
-    }
-
     static class CMap {
-        private ArrayList<DenormalizedVBox> vboxes = new ArrayList<>();
+        private ArrayList<int[]> vboxes = new ArrayList<>();
 
         public void push(VBox box) {
-            vboxes.add(new DenormalizedVBox(box, box.avg(false)));
+            vboxes.add(box.avg(false));
         }
 
         public List<int[]> palette() {
             List<int[]> r = new ArrayList<>();
-            for (DenormalizedVBox denormalizedVBox : vboxes) {
-                r.add(denormalizedVBox.getColor());
+            for (int[] denormalizedVBox : vboxes) {
+                r.add(denormalizedVBox);
             }
             Collections.reverse(r);
             return r;
