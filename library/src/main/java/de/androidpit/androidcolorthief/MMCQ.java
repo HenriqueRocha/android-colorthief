@@ -74,20 +74,17 @@ public class MMCQ {
         return (r << (2 * SIGBITS)) + (g << SIGBITS) + b;
     }
 
-    private static int[] getHisto(List<int[]> pixels) {
-        int histosize = 1 << (3 * SIGBITS);
-        int[] histo = new int[histosize];
-        for (int i = 0; i < histosize; i++) {
-            histo[i] = 0;
-        }
-        int rval, gval, bval;
+    private static int[] histogram(List<int[]> pixels) {
+        int[] histogram = new int[1 << (3 * SIGBITS)];
+
         for (int[] pixel : pixels) {
-            rval = pixel[0] >> RSHIFT;
-            gval = pixel[1] >> RSHIFT;
-            bval = pixel[2] >> RSHIFT;
-            histo[getColorIndex(rval, gval, bval)]++;
+            int rval = pixel[0] >> RSHIFT;
+            int gval = pixel[1] >> RSHIFT;
+            int bval = pixel[2] >> RSHIFT;
+            histogram[getColorIndex(rval, gval, bval)]++;
         }
-        return histo;
+
+        return histogram;
     }
 
     private static VBox vboxFromPixels(List<int[]> pixels, int[] histo) {
@@ -240,7 +237,7 @@ public class MMCQ {
         if (pixels.size() == 0 || maxcolors < 2 || maxcolors > 256) {
             return null;
         }
-        int[] histo = getHisto(pixels);
+        int[] histo = histogram(pixels);
         int nColors = 0;
         VBox vbox = vboxFromPixels(pixels, histo);
         List<VBox> pq = new ArrayList<>();
