@@ -33,6 +33,10 @@ public class MMCQ {
     private static final int MAX_ITERATIONS = 1000;
     private static final double FRACT_BY_POPULATION = 0.75;
 
+    private static final int RED = 0;
+    private static final int GREEN = 1;
+    private static final int BLUE = 2;
+
     public static List<int[]> compute(Bitmap image, int maxcolors) throws IOException {
         List<int[]> pixels = getPixels(image);
         return compute(pixels, maxcolors);
@@ -186,21 +190,21 @@ public class MMCQ {
         }
 
         return maxw == rw
-                ? doCut("r", vbox, partialsum, lookaheadsum, total)
+                ? doCut(RED, vbox, partialsum, lookaheadsum, total)
                 : maxw == gw
-                ? doCut("g", vbox, partialsum, lookaheadsum, total)
-                : doCut("b", vbox, partialsum, lookaheadsum, total);
+                ? doCut(GREEN, vbox, partialsum, lookaheadsum, total)
+                : doCut(BLUE, vbox, partialsum, lookaheadsum, total);
     }
 
-    private static VBox[] doCut(String color, VBox vbox, List<Integer> partialsum, List<Integer> lookaheadsum, int total) {
+    private static VBox[] doCut(int color, VBox vbox, List<Integer> partialsum, List<Integer> lookaheadsum, int total) {
         int dim1 = 0, dim2 = 0;
-        if ("r".equals(color)) {
+        if (color == RED) {
             dim1 = vbox.getR1();
             dim2 = vbox.getR2();
-        } else if ("g".equals(color)) {
+        } else if (color == GREEN) {
             dim1 = vbox.getG1();
             dim2 = vbox.getG2();
-        } else if ("b".equals(color)) {
+        } else if (color == BLUE) {
             dim1 = vbox.getB1();
             dim2 = vbox.getB2();
         }
@@ -223,13 +227,13 @@ public class MMCQ {
                 count2 = lookaheadsum.get(d2);
                 while (count2 == null && partialsum.get(d2 - 1) == null)
                     count2 = lookaheadsum.get(--d2);
-                if ("r".equals(color)) {
+                if (color == RED) {
                     vbox1.setR2(d2);
                     vbox2.setR1(vbox1.getR2() + 1);
-                } else if ("g".equals(color)) {
+                } else if (color == GREEN) {
                     vbox1.setG2(d2);
                     vbox2.setG1(vbox1.getG2() + 1);
-                } else if ("b".equals(color)) {
+                } else if (color == BLUE) {
                     vbox1.setB2(d2);
                     vbox2.setB1(vbox1.getB2() + 1);
                 }
