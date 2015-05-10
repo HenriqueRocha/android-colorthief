@@ -24,7 +24,6 @@ import android.graphics.Bitmap;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Collections;
-import java.util.Comparator;
 import java.util.Iterator;
 import java.util.List;
 
@@ -109,8 +108,7 @@ public class MMCQ {
             else if (bval > bmax)
                 bmax = bval;
         }
-        VBox vbox = new VBox(rmin, rmax, gmin, gmax, bmin, bmax, histo);
-        return vbox;
+        return new VBox(rmin, rmax, gmin, gmax, bmin, bmax, histo);
     }
 
     private static VBox[] medianCutApply(List<Integer> histo, VBox vbox) {
@@ -254,12 +252,7 @@ public class MMCQ {
         pq = (List<VBox>) r[0];
         nColors = (Integer) r[1];
         niters = (Integer) r[2];
-        Collections.sort(pq, new Comparator<VBox>() {
-            @Override
-            public int compare(VBox o1, VBox o2) {
-                return new Double(o1.count(false) * o1.getVolume(false)).compareTo(new Double(o1.count(false) * o1.getVolume(false)));
-            }
-        });
+        Collections.sort(pq);
         r = iter(pq, maxcolors - pq.size(), histo, nColors, niters);
         pq = (List<VBox>) r[0];
         CMap cmap = new CMap();
@@ -296,17 +289,12 @@ public class MMCQ {
             if (niters++ > MAX_ITERATIONS) {
                 return new Object[]{lh, nColors, niters};
             }
-            Collections.sort(lh, new Comparator<VBox>() {
-                @Override
-                public int compare(VBox o1, VBox o2) {
-                    return new Double(o1.count(false) * o1.getVolume(false)).compareTo(new Double(o2.count(false) * o2.getVolume(false)));
-                }
-            });
+            Collections.sort(lh);
         }
         return new Object[]{lh, nColors, niters};
     }
 
-    static class VBox {
+    static class VBox implements Comparable {
         private int r1;
         private int r2;
         private int g1;
@@ -342,8 +330,7 @@ public class MMCQ {
         }
 
         public VBox clone() {
-            VBox clone = new VBox(r1, r2, g1, g2, b1, b2, histo);
-            return clone;
+            return new VBox(r1, r2, g1, g2, b1, b2, histo);
         }
 
         public int[] avg(boolean recompute) {
@@ -435,6 +422,12 @@ public class MMCQ {
 
         public void setB2(int b2) {
             this.b2 = b2;
+        }
+
+        @Override
+        public int compareTo(Object o) {
+            VBox anotherVBox = (VBox) o;
+            return count(false) * getVolume(false) - anotherVBox.count(false) * anotherVBox.getVolume(false);
         }
     }
 
