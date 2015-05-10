@@ -74,25 +74,23 @@ public class MMCQ {
         return (r << (2 * SIGBITS)) + (g << SIGBITS) + b;
     }
 
-    private static List<Integer> getHisto(List<int[]> pixels) {
+    private static int[] getHisto(List<int[]> pixels) {
         int histosize = 1 << (3 * SIGBITS);
-        List<Integer> histo = new ArrayList<>(histosize);
+        int[] histo = new int[histosize];
         for (int i = 0; i < histosize; i++) {
-            histo.add(0);
+            histo[i] = 0;
         }
-        int index, rval, gval, bval;
+        int rval, gval, bval;
         for (int[] pixel : pixels) {
             rval = pixel[0] >> RSHIFT;
             gval = pixel[1] >> RSHIFT;
             bval = pixel[2] >> RSHIFT;
-            index = getColorIndex(rval, gval, bval);
-            Integer cur = histo.get(index);
-            histo.set(index, (cur == null ? 0 : cur) + 1);
+            histo[getColorIndex(rval, gval, bval)]++;
         }
         return histo;
     }
 
-    private static VBox vboxFromPixels(List<int[]> pixels, List<Integer> histo) {
+    private static VBox vboxFromPixels(List<int[]> pixels, int[] histo) {
         int rmin = 1000000, rmax = 0, gmin = 1000000, gmax = 0, bmin = 1000000, bmax = 0, rval, gval, bval;
         for (int[] pixel : pixels) {
             rval = pixel[0] >> RSHIFT;
@@ -114,7 +112,7 @@ public class MMCQ {
         return new VBox(rmin, rmax, gmin, gmax, bmin, bmax, histo);
     }
 
-    private static VBox[] medianCutApply(List<Integer> histo, VBox vbox) {
+    private static VBox[] medianCutApply(int[] histo, VBox vbox) {
         if (vbox.count(false) == 0)
             return null;
         if (vbox.count(false) == 1) {
@@ -131,9 +129,7 @@ public class MMCQ {
                 int sum = 0;
                 for (int j = vbox.g1; j <= vbox.g2; j++) {
                     for (int k = vbox.b1; k <= vbox.b2; k++) {
-                        int index = getColorIndex(i, j, k);
-                        Integer r = histo.get(index);
-                        sum += (r != null ? r : 0);
+                        sum += histo[getColorIndex(i, j, k)];
                     }
                 }
                 total += sum;
@@ -150,9 +146,7 @@ public class MMCQ {
                 int sum = 0;
                 for (int j = vbox.r1; j <= vbox.r2; j++) {
                     for (int k = vbox.b1; k <= vbox.b2; k++) {
-                        int index = getColorIndex(j, i, k);
-                        Integer r = histo.get(index);
-                        sum += (r != null ? r : 0);
+                        sum += histo[getColorIndex(j, i, k)];
                     }
                 }
                 total += sum;
@@ -169,9 +163,7 @@ public class MMCQ {
                 int sum = 0;
                 for (int j = vbox.r1; j <= vbox.r2; j++) {
                     for (int k = vbox.g1; k <= vbox.g2; k++) {
-                        int index = getColorIndex(j, k, i);
-                        Integer r = histo.get(index);
-                        sum += (r != null ? r : 0);
+                        sum += histo[getColorIndex(j, k, i)];
                     }
                 }
                 total += sum;
@@ -248,7 +240,7 @@ public class MMCQ {
         if (pixels.size() == 0 || maxcolors < 2 || maxcolors > 256) {
             return null;
         }
-        List<Integer> histo = getHisto(pixels);
+        int[] histo = getHisto(pixels);
         int nColors = 0;
         VBox vbox = vboxFromPixels(pixels, histo);
         List<VBox> pq = new ArrayList<>();
@@ -268,7 +260,7 @@ public class MMCQ {
         return cmap;
     }
 
-    private static Object[] iter(List<VBox> lh, double target, List<Integer> histo, int nColors, int niters) {
+    private static Object[] iter(List<VBox> lh, double target, int[] histo, int nColors, int niters) {
         VBox vbox;
         while (niters < MAX_ITERATIONS) {
             vbox = lh.get(lh.size() - 1);
@@ -310,10 +302,10 @@ public class MMCQ {
         private int[] avg;
         private Integer volume;
         private Integer count;
-        private List<Integer> histo = new ArrayList<>();
+        private int[] histo;
 
         // r1: 0 / r2: 18 / g1: 0 / g2: 31 / b1: 0 / b2: 31
-        public VBox(int r1, int r2, int g1, int g2, int b1, int b2, List<Integer> histo) {
+        public VBox(int r1, int r2, int g1, int g2, int b1, int b2, int[] histo) {
             super();
             this.r1 = r1;
             this.r2 = r2;
@@ -347,14 +339,11 @@ public class MMCQ {
             int mult = 1 << (8 - SIGBITS);
             int redSum = 0, greenSum = 0, blueSum = 0;
             int hval;
-            int histoindex;
 
             for (int i = r1; i <= r2; i++) {
                 for (int j = g1; j <= g2; j++) {
                     for (int k = b1; k <= b2; k++) {
-                        histoindex = getColorIndex(i, j, k);
-                        Integer g = histo.get(histoindex);
-                        hval = (g != null ? g : 0);
+                        hval = histo[getColorIndex(i, j, k)];
                         ntot += hval;
                         redSum += (hval * (i + 0.5) * mult);
                         greenSum += (hval * (j + 0.5) * mult);
@@ -380,8 +369,8 @@ public class MMCQ {
                 for (int j = g1; j <= g2; j++) {
                     for (int k = b1; k <= b2; k++) {
                         int index = getColorIndex(i, j, k);
-                        Integer g = histo.get(index);
-                        npix += (g != null ? g : 0);
+                        int g = histo[index];
+                        npix += g;
                     }
                 }
             }
