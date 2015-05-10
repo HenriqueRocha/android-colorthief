@@ -24,7 +24,6 @@ import android.graphics.Bitmap;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Collections;
-import java.util.Iterator;
 import java.util.List;
 
 public class MMCQ {
@@ -119,15 +118,16 @@ public class MMCQ {
         }
         int rw = vbox.r2 - vbox.r1 + 1, gw = vbox.g2 - vbox.g1 + 1, bw = vbox.b2 - vbox.b1 + 1, maxw = Math.max(Math.max(rw, gw), bw);
 
-        int total = 0, i, j, k, sum, index;
+        int total = 0;
         List<Integer> partialsum = new ArrayList<>();
         List<Integer> lookaheadsum = new ArrayList<>();
+
         if (maxw == rw) {
-            for (i = vbox.r1; i <= vbox.r2; i++) {
-                sum = 0;
-                for (j = vbox.g1; j <= vbox.g2; j++) {
-                    for (k = vbox.b1; k <= vbox.b2; k++) {
-                        index = getColorIndex(i, j, k);
+            for (int i = vbox.r1; i <= vbox.r2; i++) {
+                int sum = 0;
+                for (int j = vbox.g1; j <= vbox.g2; j++) {
+                    for (int k = vbox.b1; k <= vbox.b2; k++) {
+                        int index = getColorIndex(i, j, k);
                         Integer r = histo.get(index);
                         sum += (r != null ? r : 0);
                     }
@@ -142,11 +142,11 @@ public class MMCQ {
                 partialsum.add(i, total);
             }
         } else if (maxw == gw) {
-            for (i = vbox.g1; i <= vbox.g2; i++) {
-                sum = 0;
-                for (j = vbox.r1; j <= vbox.r2; j++) {
-                    for (k = vbox.b1; k <= vbox.b2; k++) {
-                        index = getColorIndex(j, i, k);
+            for (int i = vbox.g1; i <= vbox.g2; i++) {
+                int sum = 0;
+                for (int j = vbox.r1; j <= vbox.r2; j++) {
+                    for (int k = vbox.b1; k <= vbox.b2; k++) {
+                        int index = getColorIndex(j, i, k);
                         Integer r = histo.get(index);
                         sum += (r != null ? r : 0);
                     }
@@ -161,11 +161,11 @@ public class MMCQ {
                 partialsum.add(i, total);
             }
         } else {
-            for (i = vbox.b1; i <= vbox.b2; i++) {
-                sum = 0;
-                for (j = vbox.r1; j <= vbox.r2; j++) {
-                    for (k = vbox.g1; k <= vbox.g2; k++) {
-                        index = getColorIndex(j, k, i);
+            for (int i = vbox.b1; i <= vbox.b2; i++) {
+                int sum = 0;
+                for (int j = vbox.r1; j <= vbox.r2; j++) {
+                    for (int k = vbox.g1; k <= vbox.g2; k++) {
+                        int index = getColorIndex(j, k, i);
                         Integer r = histo.get(index);
                         sum += (r != null ? r : 0);
                     }
@@ -180,14 +180,16 @@ public class MMCQ {
                 partialsum.add(i, total);
             }
         }
-        Iterator<Integer> it = partialsum.iterator();
-        i = 0;
-        while (it.hasNext()) {
-            Integer integer = it.next();
-            lookaheadsum.add(i, total - integer);
-            i++;
+
+        for (int i = 0; i < partialsum.size(); i++) {
+            lookaheadsum.add(i, total - partialsum.get(i));
         }
-        return maxw == rw ? doCut("r", vbox, partialsum, lookaheadsum, total) : maxw == gw ? doCut("g", vbox, partialsum, lookaheadsum, total) : doCut("b", vbox, partialsum, lookaheadsum, total);
+
+        return maxw == rw
+                ? doCut("r", vbox, partialsum, lookaheadsum, total)
+                : maxw == gw
+                ? doCut("g", vbox, partialsum, lookaheadsum, total)
+                : doCut("b", vbox, partialsum, lookaheadsum, total);
     }
 
     private static VBox[] doCut(String color, VBox vbox, List<Integer> partialsum, List<Integer> lookaheadsum, int total) {
