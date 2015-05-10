@@ -48,8 +48,8 @@ public class MMCQ {
 	private static List<int[]> getPixels(Bitmap image) {
 		int width = image.getWidth();
 		int height = image.getHeight();
-		List<int[]> res = new ArrayList<int[]>();
-		List<Integer> t = new ArrayList<Integer>();
+		List<int[]> res = new ArrayList<>();
+		List<Integer> t = new ArrayList<>();
 		for (int row = 0; row < height; row++) {
 			for (int col = 0; col < width; col++) {
 				t.add(image.getPixel(col, row));
@@ -100,7 +100,7 @@ public class MMCQ {
 		private int[] _avg;
 		private Integer _volume;
 		private Integer _count;
-		private List<Integer> histo = new ArrayList<Integer>();
+		private List<Integer> histo = new ArrayList<>();
 
 		public int getVolume(boolean recompute) {
 			if (_volume == null || recompute) {
@@ -246,14 +246,14 @@ public class MMCQ {
 	}
 
 	static class CMap {
-		private ArrayList<DenormalizedVBox> vboxes = new ArrayList<DenormalizedVBox>();
+		private ArrayList<DenormalizedVBox> vboxes = new ArrayList<>();
 
 		public void push(VBox box) {
 			vboxes.add(new DenormalizedVBox(box, box.avg(false)));
 		}
 
 		public List<int[]> palette() {
-			List<int[]> r = new ArrayList<int[]>();
+			List<int[]> r = new ArrayList<>();
 			Iterator<DenormalizedVBox> it = vboxes.iterator();
 			while (it.hasNext()) {
 				DenormalizedVBox denormalizedVBox = (DenormalizedVBox) it.next();
@@ -295,7 +295,7 @@ public class MMCQ {
 
 	private static List<Integer> getHisto(List<int[]> pixels) {
 		int histosize = 1 << (3 * SIGBITS);
-		List<Integer> histo = new ArrayList<Integer>(histosize);
+		List<Integer> histo = new ArrayList<>(histosize);
 		for (int i = 0; i < histosize; i++) {
 			histo.add(0);
 		}
@@ -347,8 +347,8 @@ public class MMCQ {
 		int rw = vbox.r2 - vbox.r1 + 1, gw = vbox.g2 - vbox.g1 + 1, bw = vbox.b2 - vbox.b1 + 1, maxw = Math.max(Math.max(rw, gw), bw);
 
 		int total = 0, i, j, k, sum, index;
-		List<Integer> partialsum = new ArrayList<Integer>();
-		List<Integer> lookaheadsum = new ArrayList<Integer>();
+		List<Integer> partialsum = new ArrayList<>();
+		List<Integer> lookaheadsum = new ArrayList<>();
 		if (maxw == rw) {
 			for (i = vbox.r1; i <= vbox.r2; i++) {
 				sum = 0;
@@ -472,7 +472,7 @@ public class MMCQ {
 		List<Integer> histo = getHisto(pixels);
 		int nColors = 0;
 		VBox vbox = vboxFromPixels(pixels, histo);
-		List<VBox> pq = new ArrayList<VBox>();
+		List<VBox> pq = new ArrayList<>();
 		pq.add(vbox);
 		int niters = 0;
 		Object[] r = iter(pq, FRACT_BY_POPULATION * maxcolors, histo, nColors, niters);
