@@ -43,7 +43,7 @@ public class MMCQ {
     }
 
     public static List<int[]> compute(List<int[]> pixels, int maxcolors) {
-        CMap map = quantize(pixels, maxcolors);
+        ColorMap map = quantize(pixels, maxcolors);
         return map.palette();
     }
 
@@ -244,7 +244,7 @@ public class MMCQ {
     }
 
     @SuppressWarnings("unchecked")
-    private static CMap quantize(List<int[]> pixels, int maxcolors) {
+    private static ColorMap quantize(List<int[]> pixels, int maxcolors) {
         if (pixels.size() == 0 || maxcolors < 2 || maxcolors > 256) {
             return null;
         }
@@ -261,7 +261,7 @@ public class MMCQ {
         Collections.sort(pq);
         r = iter(pq, maxcolors - pq.size(), histo, nColors, niters);
         pq = (List<VBox>) r[0];
-        CMap cmap = new CMap();
+        ColorMap cmap = new ColorMap();
         for (VBox vBox2 : pq) {
             cmap.push(vBox2);
         }
@@ -445,20 +445,15 @@ public class MMCQ {
         }
     }
 
-    static class CMap {
+    static class ColorMap {
         private ArrayList<int[]> vboxes = new ArrayList<>();
 
         public void push(VBox box) {
-            vboxes.add(box.avg(false));
+            vboxes.add(0, box.avg(false));
         }
 
         public List<int[]> palette() {
-            List<int[]> r = new ArrayList<>();
-            for (int[] denormalizedVBox : vboxes) {
-                r.add(denormalizedVBox);
-            }
-            Collections.reverse(r);
-            return r;
+            return vboxes;
         }
 
     }
