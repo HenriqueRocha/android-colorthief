@@ -254,9 +254,7 @@ public class MMCQ {
 
 		public List<int[]> palette() {
 			List<int[]> r = new ArrayList<>();
-			Iterator<DenormalizedVBox> it = vboxes.iterator();
-			while (it.hasNext()) {
-				DenormalizedVBox denormalizedVBox = (DenormalizedVBox) it.next();
+			for (DenormalizedVBox denormalizedVBox : vboxes) {
 				r.add(denormalizedVBox.getColor());
 			}
 			Collections.reverse(r);
@@ -268,9 +266,7 @@ public class MMCQ {
 		}
 
 		public int[] map(int[] color) {
-			Iterator<DenormalizedVBox> it = vboxes.iterator();
-			while (it.hasNext()) {
-				DenormalizedVBox vb = (DenormalizedVBox) it.next();
+			for (DenormalizedVBox vb : vboxes) {
 				if (vb.vbox.contains(color))
 					return vb.color;
 			}
@@ -280,9 +276,7 @@ public class MMCQ {
 		public int[] nearest(int[] color) {
 			Double d1 = null, d2 = null;
 			int[] pColor = null;
-			Iterator<DenormalizedVBox> it = vboxes.iterator();
-			while (it.hasNext()) {
-				DenormalizedVBox vb = (DenormalizedVBox) it.next();
+			for (DenormalizedVBox vb : vboxes) {
 				d2 = Math.sqrt(Math.pow(color[0] - vb.getColor()[0], 2) + Math.pow(color[1] - vb.getColor()[1], 2) + Math.pow(color[2] - vb.getColor()[2], 2));
 				if (d2 < d1 || d1 == null) {
 					d1 = d2;
@@ -300,9 +294,7 @@ public class MMCQ {
 			histo.add(0);
 		}
 		int index, rval, gval, bval;
-		Iterator<int[]> it = pixels.iterator();
-		while (it.hasNext()) {
-			int[] pixel = (int[]) it.next();
+		for (int[] pixel : pixels) {
 			rval = pixel[0] >> RSHIFT;
 			gval = pixel[1] >> RSHIFT;
 			bval = pixel[2] >> RSHIFT;
@@ -315,9 +307,7 @@ public class MMCQ {
 
 	private static VBox vboxFromPixels(List<int[]> pixels, List<Integer> histo) {
 		int rmin = 1000000, rmax = 0, gmin = 1000000, gmax = 0, bmin = 1000000, bmax = 0, rval, gval, bval;
-		Iterator<int[]> it = pixels.iterator();
-		while (it.hasNext()) {
-			int[] pixel = (int[]) it.next();
+		for (int[] pixel : pixels) {
 			rval = pixel[0] >> RSHIFT;
 			gval = pixel[1] >> RSHIFT;
 			bval = pixel[2] >> RSHIFT;
