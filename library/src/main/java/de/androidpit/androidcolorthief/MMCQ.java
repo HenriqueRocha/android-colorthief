@@ -72,221 +72,6 @@ public class MMCQ {
         return (r << (2 * SIGBITS)) + (g << SIGBITS) + b;
     }
 
-    static class VBox {
-        private int r1;
-        private int r2;
-        private int g1;
-        private int g2;
-        private int b1;
-        private int b2;
-
-        @Override
-        public String toString() {
-            return "r1: " + r1 + " / r2: " + r2 + " / g1: " + g1 + " / g2: " + g2 + " / b1: " + b1 + " / b2: " + b2 + "\n";
-        }
-
-        // r1: 0 / r2: 18 / g1: 0 / g2: 31 / b1: 0 / b2: 31
-        public VBox(int r1, int r2, int g1, int g2, int b1, int b2, List<Integer> histo) {
-            super();
-            this.r1 = r1;
-            this.r2 = r2;
-            this.g1 = g1;
-            this.g2 = g2;
-            this.b1 = b1;
-            this.b2 = b2;
-            this.histo = histo;
-        }
-
-        private int[] _avg;
-        private Integer _volume;
-        private Integer _count;
-        private List<Integer> histo = new ArrayList<>();
-
-        public int getVolume(boolean recompute) {
-            if (_volume == null || recompute) {
-                _volume = ((r2 - r1 + 1) * (g2 - g1 + 1) * (b2 - b1 + 1));
-            }
-            return _volume;
-        }
-
-        public VBox clone() {
-            VBox clone = new VBox(r1, r2, g1, g2, b1, b2, histo);
-            return clone;
-        }
-
-        public int[] avg(boolean recompute) {
-            if (_avg == null || recompute) {
-                int ntot = 0, mult = 1 << (8 - SIGBITS), rsum = 0, gsum = 0, bsum = 0, hval, i, j, k, histoindex;
-                for (i = r1; i <= r2; i++) {
-                    for (j = g1; j <= g2; j++) {
-                        for (k = b1; k <= b2; k++) {
-                            histoindex = getColorIndex(i, j, k);
-                            Integer g = histo.get(histoindex);
-                            hval = (g != null ? g : 0);
-                            ntot += hval;
-                            rsum += (hval * (i + 0.5) * mult);
-                            gsum += (hval * (j + 0.5) * mult);
-                            bsum += (hval * (k + 0.5) * mult);
-                        }
-                    }
-                }
-                if (ntot > 0) {
-                    _avg = new int[]{~~(rsum / ntot), ~~(gsum / ntot), ~~(bsum / ntot)};
-                } else {
-                    _avg = new int[]{~~(mult * (r1 + r2 + 1) / 2), ~~(mult * (g1 + g2 + 1) / 2), ~~(mult * (b1 + b2 + 1) / 2)};
-                }
-
-            }
-            return _avg;
-        }
-
-        public boolean contains(int[] pixel) {
-            int rval = pixel[0] >> RSHIFT, gval = pixel[1] >> RSHIFT, bval = pixel[2] >> RSHIFT;
-            return (rval >= r1 && rval <= r2 && gval >= g1 && gval <= g2 && bval >= b1 && bval <= b2);
-        }
-
-        public int count(boolean recompute) {
-            if (_count == null || recompute) {
-                int npix = 0, i, j, k, index;
-                for (i = r1; i <= r2; i++) {
-                    for (j = g1; j <= g2; j++) {
-                        for (k = b1; k <= b2; k++) {
-                            index = getColorIndex(i, j, k);
-                            Integer g = histo.get(index);
-                            npix += (g != null ? g : 0);
-                        }
-                    }
-                }
-                _count = npix;
-            }
-            return _count;
-        }
-
-        public int getR1() {
-            return r1;
-        }
-
-        public void setR1(int r1) {
-            this.r1 = r1;
-        }
-
-        public int getR2() {
-            return r2;
-        }
-
-        public void setR2(int r2) {
-            this.r2 = r2;
-        }
-
-        public int getG1() {
-            return g1;
-        }
-
-        public void setG1(int g1) {
-            this.g1 = g1;
-        }
-
-        public int getG2() {
-            return g2;
-        }
-
-        public void setG2(int g2) {
-            this.g2 = g2;
-        }
-
-        public List<Integer> getHisto() {
-            return histo;
-        }
-
-        public void setHisto(List<Integer> histo) {
-            this.histo = histo;
-        }
-
-        public int getB1() {
-            return b1;
-        }
-
-        public void setB1(int b1) {
-            this.b1 = b1;
-        }
-
-        public int getB2() {
-            return b2;
-        }
-
-        public void setB2(int b2) {
-            this.b2 = b2;
-        }
-    }
-
-    static class DenormalizedVBox {
-        private VBox vbox;
-        private int[] color;
-
-        public DenormalizedVBox(VBox vbox, int[] color) {
-            this.vbox = vbox;
-            this.color = color;
-        }
-
-        public VBox getVbox() {
-            return vbox;
-        }
-
-        public void setVbox(VBox vbox) {
-            this.vbox = vbox;
-        }
-
-        public int[] getColor() {
-            return color;
-        }
-
-        public void setColor(int[] color) {
-            this.color = color;
-        }
-    }
-
-    static class CMap {
-        private ArrayList<DenormalizedVBox> vboxes = new ArrayList<>();
-
-        public void push(VBox box) {
-            vboxes.add(new DenormalizedVBox(box, box.avg(false)));
-        }
-
-        public List<int[]> palette() {
-            List<int[]> r = new ArrayList<>();
-            for (DenormalizedVBox denormalizedVBox : vboxes) {
-                r.add(denormalizedVBox.getColor());
-            }
-            Collections.reverse(r);
-            return r;
-        }
-
-        public int size() {
-            return vboxes.size();
-        }
-
-        public int[] map(int[] color) {
-            for (DenormalizedVBox vb : vboxes) {
-                if (vb.vbox.contains(color))
-                    return vb.color;
-            }
-            return nearest(color);
-        }
-
-        public int[] nearest(int[] color) {
-            Double d1 = null, d2 = null;
-            int[] pColor = null;
-            for (DenormalizedVBox vb : vboxes) {
-                d2 = Math.sqrt(Math.pow(color[0] - vb.getColor()[0], 2) + Math.pow(color[1] - vb.getColor()[1], 2) + Math.pow(color[2] - vb.getColor()[2], 2));
-                if (d2 < d1 || d1 == null) {
-                    d1 = d2;
-                    pColor = vb.getColor();
-                }
-            }
-            return pColor;
-        }
-    }
-
     private static List<Integer> getHisto(List<int[]> pixels) {
         int histosize = 1 << (3 * SIGBITS);
         List<Integer> histo = new ArrayList<>(histosize);
@@ -522,6 +307,219 @@ public class MMCQ {
             });
         }
         return new Object[]{lh, nColors, niters};
+    }
+
+    static class VBox {
+        private int r1;
+        private int r2;
+        private int g1;
+        private int g2;
+        private int b1;
+        private int b2;
+        private int[] _avg;
+        private Integer _volume;
+        private Integer _count;
+        private List<Integer> histo = new ArrayList<>();
+        // r1: 0 / r2: 18 / g1: 0 / g2: 31 / b1: 0 / b2: 31
+        public VBox(int r1, int r2, int g1, int g2, int b1, int b2, List<Integer> histo) {
+            super();
+            this.r1 = r1;
+            this.r2 = r2;
+            this.g1 = g1;
+            this.g2 = g2;
+            this.b1 = b1;
+            this.b2 = b2;
+            this.histo = histo;
+        }
+
+        @Override
+        public String toString() {
+            return "r1: " + r1 + " / r2: " + r2 + " / g1: " + g1 + " / g2: " + g2 + " / b1: " + b1 + " / b2: " + b2 + "\n";
+        }
+
+        public int getVolume(boolean recompute) {
+            if (_volume == null || recompute) {
+                _volume = ((r2 - r1 + 1) * (g2 - g1 + 1) * (b2 - b1 + 1));
+            }
+            return _volume;
+        }
+
+        public VBox clone() {
+            VBox clone = new VBox(r1, r2, g1, g2, b1, b2, histo);
+            return clone;
+        }
+
+        public int[] avg(boolean recompute) {
+            if (_avg == null || recompute) {
+                int ntot = 0, mult = 1 << (8 - SIGBITS), rsum = 0, gsum = 0, bsum = 0, hval, i, j, k, histoindex;
+                for (i = r1; i <= r2; i++) {
+                    for (j = g1; j <= g2; j++) {
+                        for (k = b1; k <= b2; k++) {
+                            histoindex = getColorIndex(i, j, k);
+                            Integer g = histo.get(histoindex);
+                            hval = (g != null ? g : 0);
+                            ntot += hval;
+                            rsum += (hval * (i + 0.5) * mult);
+                            gsum += (hval * (j + 0.5) * mult);
+                            bsum += (hval * (k + 0.5) * mult);
+                        }
+                    }
+                }
+                if (ntot > 0) {
+                    _avg = new int[]{~~(rsum / ntot), ~~(gsum / ntot), ~~(bsum / ntot)};
+                } else {
+                    _avg = new int[]{~~(mult * (r1 + r2 + 1) / 2), ~~(mult * (g1 + g2 + 1) / 2), ~~(mult * (b1 + b2 + 1) / 2)};
+                }
+
+            }
+            return _avg;
+        }
+
+        public boolean contains(int[] pixel) {
+            int rval = pixel[0] >> RSHIFT, gval = pixel[1] >> RSHIFT, bval = pixel[2] >> RSHIFT;
+            return (rval >= r1 && rval <= r2 && gval >= g1 && gval <= g2 && bval >= b1 && bval <= b2);
+        }
+
+        public int count(boolean recompute) {
+            if (_count == null || recompute) {
+                int npix = 0, i, j, k, index;
+                for (i = r1; i <= r2; i++) {
+                    for (j = g1; j <= g2; j++) {
+                        for (k = b1; k <= b2; k++) {
+                            index = getColorIndex(i, j, k);
+                            Integer g = histo.get(index);
+                            npix += (g != null ? g : 0);
+                        }
+                    }
+                }
+                _count = npix;
+            }
+            return _count;
+        }
+
+        public int getR1() {
+            return r1;
+        }
+
+        public void setR1(int r1) {
+            this.r1 = r1;
+        }
+
+        public int getR2() {
+            return r2;
+        }
+
+        public void setR2(int r2) {
+            this.r2 = r2;
+        }
+
+        public int getG1() {
+            return g1;
+        }
+
+        public void setG1(int g1) {
+            this.g1 = g1;
+        }
+
+        public int getG2() {
+            return g2;
+        }
+
+        public void setG2(int g2) {
+            this.g2 = g2;
+        }
+
+        public List<Integer> getHisto() {
+            return histo;
+        }
+
+        public void setHisto(List<Integer> histo) {
+            this.histo = histo;
+        }
+
+        public int getB1() {
+            return b1;
+        }
+
+        public void setB1(int b1) {
+            this.b1 = b1;
+        }
+
+        public int getB2() {
+            return b2;
+        }
+
+        public void setB2(int b2) {
+            this.b2 = b2;
+        }
+    }
+
+    static class DenormalizedVBox {
+        private VBox vbox;
+        private int[] color;
+
+        public DenormalizedVBox(VBox vbox, int[] color) {
+            this.vbox = vbox;
+            this.color = color;
+        }
+
+        public VBox getVbox() {
+            return vbox;
+        }
+
+        public void setVbox(VBox vbox) {
+            this.vbox = vbox;
+        }
+
+        public int[] getColor() {
+            return color;
+        }
+
+        public void setColor(int[] color) {
+            this.color = color;
+        }
+    }
+
+    static class CMap {
+        private ArrayList<DenormalizedVBox> vboxes = new ArrayList<>();
+
+        public void push(VBox box) {
+            vboxes.add(new DenormalizedVBox(box, box.avg(false)));
+        }
+
+        public List<int[]> palette() {
+            List<int[]> r = new ArrayList<>();
+            for (DenormalizedVBox denormalizedVBox : vboxes) {
+                r.add(denormalizedVBox.getColor());
+            }
+            Collections.reverse(r);
+            return r;
+        }
+
+        public int size() {
+            return vboxes.size();
+        }
+
+        public int[] map(int[] color) {
+            for (DenormalizedVBox vb : vboxes) {
+                if (vb.vbox.contains(color))
+                    return vb.color;
+            }
+            return nearest(color);
+        }
+
+        public int[] nearest(int[] color) {
+            Double d1 = null, d2 = null;
+            int[] pColor = null;
+            for (DenormalizedVBox vb : vboxes) {
+                d2 = Math.sqrt(Math.pow(color[0] - vb.getColor()[0], 2) + Math.pow(color[1] - vb.getColor()[1], 2) + Math.pow(color[2] - vb.getColor()[2], 2));
+                if (d2 < d1 || d1 == null) {
+                    d1 = d2;
+                    pColor = vb.getColor();
+                }
+            }
+            return pColor;
+        }
     }
 
 }
