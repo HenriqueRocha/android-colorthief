@@ -316,9 +316,9 @@ public class MMCQ {
         private int g2;
         private int b1;
         private int b2;
-        private int[] _avg;
-        private Integer _volume;
-        private Integer _count;
+        private int[] avg;
+        private Integer volume;
+        private Integer count;
         private List<Integer> histo = new ArrayList<>();
         // r1: 0 / r2: 18 / g1: 0 / g2: 31 / b1: 0 / b2: 31
         public VBox(int r1, int r2, int g1, int g2, int b1, int b2, List<Integer> histo) {
@@ -338,10 +338,10 @@ public class MMCQ {
         }
 
         public int getVolume(boolean recompute) {
-            if (_volume == null || recompute) {
-                _volume = ((r2 - r1 + 1) * (g2 - g1 + 1) * (b2 - b1 + 1));
+            if (volume == null || recompute) {
+                volume = ((r2 - r1 + 1) * (g2 - g1 + 1) * (b2 - b1 + 1));
             }
-            return _volume;
+            return volume;
         }
 
         public VBox clone() {
@@ -350,7 +350,7 @@ public class MMCQ {
         }
 
         public int[] avg(boolean recompute) {
-            if (_avg == null || recompute) {
+            if (avg == null || recompute) {
                 int ntot = 0, mult = 1 << (8 - SIGBITS), rsum = 0, gsum = 0, bsum = 0, hval, i, j, k, histoindex;
                 for (i = r1; i <= r2; i++) {
                     for (j = g1; j <= g2; j++) {
@@ -366,13 +366,13 @@ public class MMCQ {
                     }
                 }
                 if (ntot > 0) {
-                    _avg = new int[]{~~(rsum / ntot), ~~(gsum / ntot), ~~(bsum / ntot)};
+                    avg = new int[]{~~(rsum / ntot), ~~(gsum / ntot), ~~(bsum / ntot)};
                 } else {
-                    _avg = new int[]{~~(mult * (r1 + r2 + 1) / 2), ~~(mult * (g1 + g2 + 1) / 2), ~~(mult * (b1 + b2 + 1) / 2)};
+                    avg = new int[]{~~(mult * (r1 + r2 + 1) / 2), ~~(mult * (g1 + g2 + 1) / 2), ~~(mult * (b1 + b2 + 1) / 2)};
                 }
 
             }
-            return _avg;
+            return avg;
         }
 
         public boolean contains(int[] pixel) {
@@ -381,7 +381,7 @@ public class MMCQ {
         }
 
         public int count(boolean recompute) {
-            if (_count == null || recompute) {
+            if (count == null || recompute) {
                 int npix = 0, i, j, k, index;
                 for (i = r1; i <= r2; i++) {
                     for (j = g1; j <= g2; j++) {
@@ -392,9 +392,9 @@ public class MMCQ {
                         }
                     }
                 }
-                _count = npix;
+                count = npix;
             }
-            return _count;
+            return count;
         }
 
         public int getR1() {
