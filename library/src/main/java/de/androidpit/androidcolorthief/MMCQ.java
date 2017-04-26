@@ -48,26 +48,24 @@ public class MMCQ {
     }
 
     private static List<int[]> getPixels(Bitmap image) {
-        int width = image.getWidth();
-        int height = image.getHeight();
-        List<int[]> res = new ArrayList<>();
-        List<Integer> t = new ArrayList<>();
-        for (int row = 0; row < height; row++) {
-            for (int col = 0; col < width; col++) {
-                t.add(image.getPixel(col, row));
-            }
-        }
-        for (int i = 0; i < t.size(); i += 10) {
-            int[] rr = new int[3];
-            int argb = t.get(i);
-            rr[0] = (argb >> 16) & 0xFF;
-            rr[1] = (argb >> 8) & 0xFF;
-            rr[2] = (argb) & 0xFF;
-            if (!(rr[0] > 250 && rr[1] > 250 && rr[2] > 250)) {
-                res.add(rr);
-            }
-        }
-        return res;
+		int width = image.getWidth();
+		int height = image.getHeight();
+		List<int[]> res = new ArrayList<>();
+
+		int[] pixels = new int[width * height];
+		image.getPixels(pixels, 0, width, 0, 0, width, height);
+
+		for (int i = 0; i < pixels.length; i += 10) {
+			int[] rr = new int[3];
+			int argb = pixels[i];
+			rr[0] = (argb >> 16) & 0xFF;
+			rr[1] = (argb >> 8) & 0xFF;
+			rr[2] = (argb) & 0xFF;
+			if (!(rr[0] > 250 && rr[1] > 250 && rr[2] > 250)) {
+				res.add(rr);
+			}
+		}
+		return res;
     }
 
     private static int getColorIndex(int r, int g, int b) {
